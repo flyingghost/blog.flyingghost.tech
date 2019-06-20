@@ -1,0 +1,12 @@
+#!/bin/sh
+
+WORKSPACE='/Users/jacky/blog.flyingghost.tech/hugo/'
+HOST=blog.flyingghost.tech
+USER=jacky
+KEY_FILE='/Users/jacky/.ssh/id_rsa'
+REMOTE_DIR=/var/www/blog   # might sometimes be empty!
+
+hugo
+rsync -avzt --delete -e "ssh -p 22 -i ${KEY_FILE}" ${WORKSPACE}public ${USER}@${HOST}:${DIR}
+
+exit 0
