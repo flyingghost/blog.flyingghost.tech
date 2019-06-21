@@ -4,3 +4,12 @@
 
 baseURL = "https://blog.flyingghost.tech/"
 title = "子非鬼"
+
+
+
+[params]
+
+  tencent_analytics = "66444964"    # Tencent Analytics
+
+  [params.livere]          	#LiveRe comment. see https://www.livere.com/
+	  uid = "MTAyMC80NDg0Ni8yMTM2Nw=="

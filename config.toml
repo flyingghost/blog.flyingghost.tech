@@ -83,6 +83,9 @@ defaultContentLanguage = "zh-cn"           # Default language to use
   customCSS = []            # if ['custom.css'], load '/static/css/custom.css' file
   customJS = []             # if ['custom.js'], load '/static/js/custom.js' file
 
+  # add custom info on the footer.   # 添加备案信息
+  customFooter = "沪ICP备19018145号-1"
+
   # [params.social]                                         # 社交链接
     # a-email = "mailto:flyingghost@gmail.com"
     # b-stack-overflow = "http://localhost:1313"
