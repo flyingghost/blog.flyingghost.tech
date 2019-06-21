@@ -7,6 +7,6 @@ KEY_FILE='/Users/jacky/.ssh/id_rsa'
 REMOTE_DIR=/var/www/blog   # might sometimes be empty!
 
 hugo
-rsync -avzt --delete -e "ssh -p 22 -i ${KEY_FILE}" ${WORKSPACE}public ${USER}@${HOST}:${DIR}
+rsync -avzt --delete -e "ssh -p 22 -i ${KEY_FILE}" ${WORKSPACE}public/ ${USER}@${HOST}:${REMOTE_DIR}
 
 exit 0
