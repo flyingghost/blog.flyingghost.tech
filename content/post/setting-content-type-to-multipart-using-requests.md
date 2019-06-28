@@ -8,7 +8,7 @@ draft: false
 
 群里有朋友提问，如何使用`requests`实现如下图postman的`Content-Type`设置？
 
-![](https://fg-public-1252239724.cos.ap-shanghai.myqcloud.com/blog/20190624164458.png)
+![](https://fg-public-1252239724.file.myqcloud.com/blog/20190624164458.png)
 
 
 
@@ -38,7 +38,7 @@ HTTP协议规定了HTTP请求的基本格式，包括method、url、header、bod
 
 表单很简单，包含两个文件和两个文本字段。
 
-![](https://fg-public-1252239724.cos.ap-shanghai.myqcloud.com/blog/20190624182726.png)
+![](https://fg-public-1252239724.file.myqcloud.com/blog/20190624182726.png)
 
 提交的表单可以使用Charles、Wireshark等抓包工具抓到原始报文。
 

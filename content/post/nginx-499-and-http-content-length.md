@@ -19,7 +19,7 @@ draft: false
 
 那么再看nginx反代。nginx很实诚的留下了access日志，请求状态码499。
 
-![](https://fg-public-1252239724.cos.ap-shanghai.myqcloud.com/blog/20190621120310.png)
+![](https://fg-public-1252239724.file.myqcloud.com/blog/20190621120310.png)
 
 
 
@@ -60,13 +60,13 @@ It works! 看来连接也不是真正的已经完全断掉了，server还是可�
 
 使用Wireshark抓包，找到这个HTTP请求对应的TCP包序列。
 
-![](https://fg-public-1252239724.cos.ap-shanghai.myqcloud.com/blog/20190621150134.png)
+![](https://fg-public-1252239724.file.myqcloud.com/blog/20190621150134.png)
 
 
 
 回顾一下TCP连接的三次握手：
 
-![](https://fg-public-1252239724.cos.ap-shanghai.myqcloud.com/blog/Connection_TCP.png)
+![](https://fg-public-1252239724.file.myqcloud.com/blog/Connection_TCP.png)
 
 - 18312 client发送SYN
 - 18317 server发送ACK + SYN
@@ -81,7 +81,7 @@ It works! 看来连接也不是真正的已经完全断掉了，server还是可�
 
 再复习一下TCP连接的四次挥手：
 
-![](https://fg-public-1252239724.cos.ap-shanghai.myqcloud.com/blog/Deconnection_TCP.png)
+![](https://fg-public-1252239724.file.myqcloud.com/blog/Deconnection_TCP.png)
 
 - 18952，client发送FIN，我觉得我们应该分手
 - 18958，server发送ACK，同意
@@ -90,7 +90,7 @@ It works! 看来连接也不是真正的已经完全断掉了，server还是可�
 
 看来问题确认了：确实是客户端主动发送FIN关闭连接的，server同意了，连接被正常关闭。而这竟然发生在刚刚发完POST请求后的同时。
 
-![](https://fg-public-1252239724.cos.ap-shanghai.myqcloud.com/blog/20190621151539.png)
+![](https://fg-public-1252239724.file.myqcloud.com/blog/20190621151539.png)
 
 18951(149)已经携带了所有POST载荷，18952仅仅是为了FIN而已。
 
@@ -118,7 +118,7 @@ It works! 看来连接也不是真正的已经完全断掉了，server还是可�
 
 回头再看看我们的请求：
 
-![](https://fg-public-1252239724.cos.ap-shanghai.myqcloud.com/blog/20190621154111.png)
+![](https://fg-public-1252239724.file.myqcloud.com/blog/20190621154111.png)
 
 这货什么都没带啊！只好主动关闭连接以告知“我说完了我不说了”啊！
 
