@@ -4,3 +4,7 @@
 
 baseURL = "http://localhost:1313/"
 title = "开发子非鬼"
+
+buildDrafts = true
+buildExpired = true
+buildFuture = true
