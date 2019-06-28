@@ -2,10 +2,13 @@
 title: "cafebabe、deadbeef 与HEX words"
 date: 2019-06-20T21:31:41+08:00
 
+tags:
+- python
+- pandas
+
 ---
 
 
-# cafebabe、deadbeef 与HEX words
 
 Java的class文件有一个固定的文件头：`CAFEBABE`，正好是一个16进制字符串，用来做二进制文件的头部非常适合，既隐含Java的咖啡文化，还有一点可爱和调皮，可以说是geek界著名的神来之笔了。
 

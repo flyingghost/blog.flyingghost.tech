@@ -2,9 +2,12 @@
 title: "使用requests发送指定Content-Type的multipart请求"
 date: 2019-06-25T01:54:55+08:00
 draft: false
+
+tags:
+- python
+- HTTP
 ---
 
-# 使用requests发送指定Content-Type的multipart请求
 
 群里有朋友提问，如何使用`requests`实现如下图postman的`Content-Type`设置？
 

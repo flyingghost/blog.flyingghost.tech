@@ -2,10 +2,14 @@
 title: "nginx 499错误和HTTP Content-Length"
 date: 2019-06-21T01:27:07+08:00
 draft: false
+
+tags:
+- HTTP
+- nginx
+- TCP
 ---
 
 
-# nginx 499错误和HTTP Content-Length
 
 ## 0，问题
 
