@@ -1,7 +1,7 @@
 ---
 title: "使用pandas分析nginx日志：一，解析"
 date: 2019-06-28T16:07:59+08:00
-draft: true
+draft: false
 
 
 tags:
@@ -138,7 +138,9 @@ pandas对于csv文件有着比较好的支持。我们最方便的目标就是`p
 
 正则：`/ (?=(?:[^"]*"[^"]*")*[^"]*$)(?![^\[]*\])/`
 
-![image-20190628172357434](/Users/jacky/Library/Application Support/typora-user-images/image-20190628172357434.png)
+![](https://fg-public-1252239724.file.myqcloud.com/blog/image-20190628172357434.png)
+
+
 
 检察一下，非常完美。
 
