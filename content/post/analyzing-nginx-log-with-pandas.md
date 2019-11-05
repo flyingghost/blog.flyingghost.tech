@@ -1,16 +1,12 @@
 ---
-title: "使用pandas分析nginx日志：一，解析"
+title: "使用pandas分析nginx日志"
 date: 2019-06-28T16:07:59+08:00
-draft: false
-
+draft: true
 
 tags:
 - python
 - pandas
 - 正则表达式
-
-series:
-- 使用pandas分析nginx日志
 ---
 
 
@@ -22,15 +18,15 @@ series:
 
 虽然nginx日志看起来乱糟糟，但其实它不只像像而已，它根本就是表格，一个典型的时序多字段表格。最适合拿来做各种纬度的柱状图折线图大饼图小点图。
 
-由于涉及到的技术点比较多，我们会以一个系列文章的形式展开这段探索。
-
-首先，我们要介绍的是，如何解析。
+我们将会以jupyter notebook为开发环境，以pandas为工具，以一个真实站点的nginx日志为目标，开展我们的数据探索旅程。
 
 
 
 ## 解析
 
-pandas对于csv文件有着比较好的支持。我们最方便的目标就是`pandas.read_csv()`函数，它接受一个csv格式的文本表格。
+分析的第一步，当然是解析日志文件，那个有着严格字段格式但看起来有点凌乱的文本。
+
+pandas对于纯文本文件读取有着比较好的支持，我们最方便的手段就是`pandas.read_csv()`函数，它接受一个csv格式的文本表格。
 
 不幸的是，我们的nginx日志并不是标准csv格式。
 
@@ -48,7 +44,7 @@ pandas对于csv文件有着比较好的支持。我们最方便的目标就是`p
 具体的日志行长这样：
 
 ```
-124.236.234.124 - - [25/Jun/2019:06:57:43 +0800] "GET /lib/photoswipe/photoswipe.min.css HTTP/2.0" 200 771 "https://blog.flyingghost.tech/post/setting-content-type-to-multipart-using-requests/" "Mozilla/5.0 (iPhone; CPU iPhone OS 11_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15G77 QQ/8.0.6.432 V1_IPH_SQ_8.0.6_1_APP_A Pixel/750 Core/WKWebView Device/Apple(iPhone 7) NetType/WIFI QBWebViewType/1 WKType/1" "-" "-" "0.000" "313817917da62341e884764f6a2411c5"
+203.208.60.120 - - [03/Jul/2019:23:59:49 +0800] "GET /case-library/205 HTTP/1.1" 200 7110 "-" "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" "-" "0.077" "0.077" "c3d263d45fa2066e9097c582217bf60c"
 ```
 
 
@@ -165,7 +161,7 @@ df = pd.read_csv(
     engine='python',
     header=None,
     index_col=False,
-    names=['ip', 'user', 'time', 'request', 'status', 'size', 
+    names=['ip', '-', 'user', 'time', 'request', 'status', 'size', 
            'referer', 'ua', 'forwarded_for', 'upstream-response-time',
           'request_time', 'request_id'],
 )
@@ -173,4 +169,105 @@ df = pd.read_csv(
 
 解析成功！
 
-下一篇文章我们将会对数据进行清洗和初步处理。
+
+
+接下来我们将会对数据进行清洗和初步处理，把它做的更方便后续统计一些。
+
+## 数据观察
+
+先观察一下当前数据：
+
+```python
+import pandas as pd
+
+df = pd.read_csv(
+    'blog.access.log',
+    sep=' (?=(?:[^"]*"[^"]*")*[^"]*$)(?![^\[]*\])',
+    engine='python',
+    header=None,
+    index_col=False,
+    names=['ip', '-', 'user', 'time', 'request', 'status', 'size', 
+           'referer', 'ua', 'forwarded_for', 'upstream_response_time',
+          'request_time', 'request_id'],
+)
+df.head()
+df.info()
+```
+
+![](https://fg-public-1252239724.file.myqcloud.com/blog/20190629234406.png)
+
+![](https://fg-public-1252239724.file.myqcloud.com/blog/20190629234912.png)
+
+
+
+问题很多啊！
+
+- 有空列。这是由于原始nginx log配置里就有一列是单独的`-`号。
+- time列有额外的`[]`字符，并且类型也不是datetime。
+- 好几个列有`""`号。
+- status列其实应为字符串，因为它并不作为数字更不能进行任何运算。
+- referer列存在"-"值，这个值在语义来说其实应该是空值，也就是请求根本没带referer头。
+- forwarded/upstream/request_id等几列没什么统计意义。
+- 其实upstream非常重要，它直接反映了应用服务器处理请求的耗时。可惜我的博客没有upstream，hugo生成静态文件直接由nginx伺服。
+
+## 解析预处理
+
+针对以上问题，我们需要细化`read_csv()`的几个参数。
+
+`usecols`，指定DataFrame将要使用的列，可传入列索引列表，或者列名的列表，列名可以来自于csv文件的表头或者`names`参数。
+
+`na_values`，指定将会被解析为`NaN`值的字符串。
+
+`converters`，指定解析某些列时使用的转换函数。
+
+于是带了一堆预处理参数的`read_csv()`如下：
+
+```python
+from datetime import datetime
+
+df = pd.read_csv(
+    'blog.access.log',
+    sep=' (?=(?:[^"]*"[^"]*")*[^"]*$)(?![^\[]*\])',
+    engine='python',
+    header=None,
+    index_col=False,
+    names=['ip', '-', 'user', 'time', 'request', 'status', 'size', 
+           'referer', 'ua', 'forwarded_for', 'upstream_response_time',
+           'request_time', 'request_id'],
+    usecols=['ip', 'time', 'request', 'status', 'size', 'referer', 'ua', 'request_time'],
+    na_values='-',
+    converters={
+        'time': lambda x: datetime.strptime(x, '[%d/%b/%Y:%H:%M:%S %z]'),
+        'request': lambda x: x[1:-1],
+        'status': str,
+        'size': int,
+        'referer': lambda x: x[1:-1],
+        'ua': lambda x: x[1:-1],
+        'request_time': lambda x: float(x[1:-1]),
+    }
+)
+```
+
+![image-20190630003119317](/Users/jacky/Library/Application%20Support/typora-user-images/image-20190630003119317.png)
+
+## 复合数据拆分
+
+上图的数据好看多了。但还有一个问题：
+
+request列其实是复合信息，包含了请求方法、路径、HTTP协议版本等信息。
+
+对于请求分析来说，这几个字段尤其是路径是必须独立统计的。所以有必要把他们拆开。
+
+pandas中有一个方法`pandas.Series.str.extract()`可以把`Series`（一般也就是`DataFrame`的一个列）的每个值按照正则表达式拆成多部分，生成一张表格，然后可以把新的DataFrame合并回原始表格中。
+
+```python
+request_df = df.request.str.extract(r'(?P<method>\w+) (?P<url>.*) (?P<schema>.*)$', expand=True)
+df = df.join(request_df)
+```
+
+
+
+
+
+
+
