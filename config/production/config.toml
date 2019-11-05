@@ -11,5 +11,10 @@ title = "子非鬼"
 
   tencent_analytics = "66444964"    # Tencent Analytics
 
-  [params.livere]          	#LiveRe comment. see https://www.livere.com/
-	  uid = "MTAyMC80NDg0Ni8yMTM2Nw=="
+  [params.utteranc]         # utteranc is a comment system based on GitHub issues. see https://utteranc.es
+    enable = true
+    repo = "flyingghost/blog.flyingghost.tech"    # The repo to store comments
+    issueTerm = "pathname"
+
+  # [params.livere]          	#LiveRe comment. see https://www.livere.com/
+	#   uid = "MTAyMC80NDg0Ni8yMTM2Nw=="
